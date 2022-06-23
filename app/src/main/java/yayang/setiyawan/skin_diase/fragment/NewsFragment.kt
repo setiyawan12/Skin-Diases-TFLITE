@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import yayang.setiyawan.skin_diase.R
 import yayang.setiyawan.skin_diase.databinding.FragmentHospitalBinding
 
-class HospitalFragment : Fragment() {
+class NewsFragment : Fragment() {
     private lateinit var binding:FragmentHospitalBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

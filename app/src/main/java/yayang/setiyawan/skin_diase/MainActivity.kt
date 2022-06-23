@@ -5,25 +5,24 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
-import android.nfc.NfcAdapter.EXTRA_DATA
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.github.florent37.runtimepermission.kotlin.askPermission
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.startActivityForResult
 import yayang.setiyawan.skin_diase.clasification.Clasification
 import yayang.setiyawan.skin_diase.data.DetectionResult
 import yayang.setiyawan.skin_diase.databinding.ActivityMainBinding
 import yayang.setiyawan.skin_diase.fragment.AkunFragment
 import yayang.setiyawan.skin_diase.fragment.HistoryFragment
 import yayang.setiyawan.skin_diase.fragment.HomeFragment
-import yayang.setiyawan.skin_diase.fragment.HospitalFragment
+import yayang.setiyawan.skin_diase.fragment.NewsFragment
+import yayang.setiyawan.skin_diase.helper.SharedPref
+import yayang.setiyawan.skin_diase.ui.LoginActivity
 import yayang.setiyawan.skin_diase.ui.ResultActivity
 
 class MainActivity : AppCompatActivity() {
@@ -32,37 +31,47 @@ class MainActivity : AppCompatActivity() {
         private const val IMAGE_REQUEST_CODE=100
     }
     private lateinit var binding:ActivityMainBinding
-
+    //buat variable Minput, Modelpath, mlabel path
     private val mInputSize = 224
-    private val mModelPath = "model_elequentv3.tflite"
+    private val mModelPath = "model_ches.tflite"
     private val mLabelPath = "labels.txt"
+    //
     private lateinit var clasification: Clasification
 
     private val rotateOpen: Animation by lazy{AnimationUtils.loadAnimation(this,R.anim.rotate_anim_open)}
     private val rotateClose: Animation by lazy{AnimationUtils.loadAnimation(this,R.anim.rotate_anim_close)}
     private val fromBottom: Animation by lazy{AnimationUtils.loadAnimation(this,R.anim.from_bottom_anim)}
     private val toBottom: Animation by lazy{AnimationUtils.loadAnimation(this,R.anim.to_bottom_anim)}
+    lateinit var sharedPref: SharedPref
 
     private var clicked = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharedPref = SharedPref(this)
 
+        //dipanggil
         clasification = Clasification(assets,mModelPath,mLabelPath,mInputSize)
         askPermissions()
         val homeFragment = HomeFragment()
         val historyFragment = HistoryFragment()
-        val hospitalFragment = HospitalFragment()
+        val newsFragment = NewsFragment()
         val akunFragment = AkunFragment()
 
         setCurrentFragment(homeFragment)
         binding.bottomNavigationView.setOnNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.nvHome ->setCurrentFragment(homeFragment)
-                R.id.nvHospital->setCurrentFragment(hospitalFragment)
+                R.id.nvNews->setCurrentFragment(newsFragment)
                 R.id.nvHistory->setCurrentFragment(historyFragment)
-                R.id.nvProfile->setCurrentFragment(akunFragment)
+                R.id.nvProfile->{
+                 if (sharedPref.getStatusLogin()){
+                     setCurrentFragment(akunFragment)
+                 }else{
+                     startActivity(Intent(this,LoginActivity::class.java))
+                 }
+                }
             }
             true
         }
@@ -99,20 +108,20 @@ class MainActivity : AppCompatActivity() {
                     intent.putExtra(ResultActivity.EXTRA_DATA, detectionResult)
                     startActivity(intent)
                 }
-                IMAGE_REQUEST_CODE->{
-                    val bitmap = data?.extras?.get("data") as Bitmap
-                    val result = clasification.recognizeImage(bitmap)
-                    val confidence = result[0].confidence * 100
-                    val detectionResult = DetectionResult(
-                        1,
-                        bitmap,
-                        result[0].title,
-                        confidence.toInt()
-                    )
-                    val intent = Intent(this, ResultActivity::class.java)
-                    intent.putExtra(ResultActivity.EXTRA_DATA, detectionResult)
-                    startActivity(intent)
-                }
+//                IMAGE_REQUEST_CODE->{
+//                    val bitmap = data?.extras?.get("data") as Bitmap
+//                    val result = clasification.recognizeImage(bitmap)
+//                    val confidence = result[0].confidence * 100
+//                    val detectionResult = DetectionResult(
+//                        1,
+//                        bitmap,
+//                        result[0].title,
+//                        confidence.toInt()
+//                    )
+//                    val intent = Intent(this, ResultActivity::class.java)
+//                    intent.putExtra(ResultActivity.EXTRA_DATA, detectionResult)
+//                    startActivity(intent)
+//                }
             }
         }
 

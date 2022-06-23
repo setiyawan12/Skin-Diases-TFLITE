@@ -1,57 +1,41 @@
-package yayang.setiyawan.skin_diase.fragment
+package yayang.setiyawan.skin_diase.ui
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.activity_get.*
 import yayang.setiyawan.skin_diase.R
 import yayang.setiyawan.skin_diase.adapter.AdapterProduk
 import yayang.setiyawan.skin_diase.contract.ProductContract
 import yayang.setiyawan.skin_diase.model.Produk
 import yayang.setiyawan.skin_diase.presenter.ProductPresenter
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
-class HomeFragment : Fragment(),ProductContract.View {
-    private lateinit var presenter: ProductContract.Presenter
+class GetActivity : AppCompatActivity(),ProductContract.View {
+    private lateinit var presenter:ProductContract.Presenter
     lateinit var adapterProduk: AdapterProduk
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view:View = inflater.inflate(R.layout.fragment_home,container,false)
-        init(view)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_get)
         presenter = ProductPresenter(this)
         presenter?.getAllProduct()
-        return view
-    }
-
-    fun init(view: View){
-
     }
 
     override fun attachToRecycler(listProduk: List<Produk>) {
-        view?.rv_produk?.apply {
-            adapterProduk = AdapterProduk(requireActivity(),listProduk)
+        rv_product?.apply {
+            adapterProduk = AdapterProduk(this@GetActivity,listProduk)
             adapter = adapterProduk
-            val linearLayoutManager = LinearLayoutManager(activity)
+            val linearLayoutManager = LinearLayoutManager(this@GetActivity)
             linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
             layoutManager = linearLayoutManager
         }
     }
 
     override fun emptydata(status: Boolean) {
-        if (status){
-
-        }else{
-
-        }
     }
 
     override fun toast(message: String) {
-        Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {

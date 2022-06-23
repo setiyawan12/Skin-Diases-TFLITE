@@ -13,6 +13,8 @@ import java.util.*
 import kotlin.Comparator
 
 class Clasification(assetManager:AssetManager,modelPath:String,labelPath:String,inputSize:Int) {
+
+    //variable
     private var interpreter: Interpreter
     private var lableList: List<String>
     private val INPUT_SIZE: Int = inputSize
@@ -50,7 +52,6 @@ class Clasification(assetManager:AssetManager,modelPath:String,labelPath:String,
     }
     private fun loadLabelList(assetManager: AssetManager, labelPath: String): List<String> {
         return assetManager.open(labelPath).bufferedReader().useLines { it.toList() }
-
     }
     fun recognizeImage(bitmap: Bitmap): List<Recognition> {
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE, INPUT_SIZE, false)
